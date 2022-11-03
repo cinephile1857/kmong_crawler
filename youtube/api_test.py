@@ -1,20 +1,49 @@
 import googleapiclient.discovery
+import os
+import pandas as pd
+
+
+"""
+
+응답으로부터 딕셔너리 만드는 부분 모두 함수로 변경
+
+리플라이는 저장하고 거꾸로 읽도록 변경
+
+api 키 리스트로 만들고
+
+초과하면 알아서 다음 키로 사용하게 코드 수정
+
+
+"""
+
+
+def overwrite_csv(data,directory):
+    data = pd.DataFrame.from_dict([data])
+    if not os.path.exists(directory):
+        data.to_csv(directory, mode='w', index=False, header=True, encoding='utf-8-sig')
+    else:
+        data.to_csv(directory, mode='a', index=False, header=False, encoding='utf-8-sig')
+
 
 # API information
 api_service_name = "youtube"
 api_version = "v3"
-
-# API key
 DEVELOPER_KEY = "AIzaSyB5K8CCGzL-5e2u4VvwUEUWBPeUoCHOqdA"
-
 # cinephile1854: AIzaSyB5K8CCGzL-5e2u4VvwUEUWBPeUoCHOqdA
 # agayong93: AIzaSyDzbqF9EhH0TOYFc4JSy-kWrXRyuW_yo6Y
 
-# API client
+save_path = "C:\\Users\\agayo\\Desktop\\크몽\\daily_test\\comment_test.csv"
+
+
+
+
+
+
+
 youtube = googleapiclient.discovery.build(
     api_service_name, api_version, developerKey = DEVELOPER_KEY)
 
-# Request body
+
 comment_request = youtube.commentThreads().list(
         part="snippet,replies",
         maxResults=100,
@@ -23,23 +52,22 @@ comment_request = youtube.commentThreads().list(
         pageToken = ""
 )
 
-
-# Request execution
 comment_response = comment_request.execute()
-
-
-print(comment_response)
-
 
 
 comment_nextPageToken = ''
 if 'nextPageToken' in comment_response:
     comment_nextPageToken = comment_response["nextPageToken"]
 
+
+
+
+
 items = comment_response["items"]
 
 
 
+comment_count = 0
 
 for comment in items:
     comment_dict = {}
@@ -57,7 +85,12 @@ for comment in items:
     comment_dict["publish_time"] = comment["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
     comment_dict["update_time"] = comment["snippet"]["topLevelComment"]["snippet"]["updatedAt"]
 
+    comment_count += 1
+    overwrite_csv(comment_dict, save_path)
+    print("================"+"save comment: "+str(comment_count)+"================")
+
     if 'replies' in comment:
+        reply_count = 0
         if comment["snippet"]["totalReplyCount"] == len(comment["replies"]["comments"]):
             replies = comment["replies"]["comments"]
             for reply in replies:
@@ -74,13 +107,13 @@ for comment in items:
                 reply_dict["publish_time"] = reply["snippet"]["publishedAt"]
                 reply_dict["update_time"] = reply["snippet"]["updatedAt"]
 
-                reply_list.append(reply_dict)
-                print()
+                reply_count += 1
+                overwrite_csv(reply_dict, save_path)
+                print("=======save reply: "+str(reply_count)+"/"+str(comment_dict["reply_count"])+"=======")
 
         else:
-            reply_list = []
+            reply_nextPageToken = ''
             while True:
-                reply_nextPageToken = ''
                 reply_request = youtube.comments().list(
                     part="snippet",
                     maxResults=100,
@@ -104,8 +137,9 @@ for comment in items:
                     reply_dict["publish_time"] = reply["snippet"]["publishedAt"]
                     reply_dict["update_time"] = reply["snippet"]["updatedAt"]
 
-                    reply_list.append(reply_dict)
-                    print()
+                    reply_count += 1
+                    overwrite_csv(reply_dict, save_path)
+                    print("=======save reply: " + str(reply_count) + "/" + str(comment_dict["reply_count"]) + "=======")
 
                 if 'nextPageToken' in reply_response:
                     reply_nextPageToken = reply_response["nextPageToken"]
