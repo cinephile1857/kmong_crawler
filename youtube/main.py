@@ -1,13 +1,54 @@
 import googleapiclient.discovery
 import os
+from multiprocessing import Pool,cpu_count
 import pandas as pd
 import time
+import natsort
+import shutil
 
+path = os.getcwd()
+cpu_num = cpu_count()
 api_service_name = "youtube"
 api_version = "v3"
 developer_key_list = ["AIzaSyB5K8CCGzL-5e2u4VvwUEUWBPeUoCHOqdA", "AIzaSyDzbqF9EhH0TOYFc4JSy-kWrXRyuW_yo6Y",
                       "AIzaSyDiphH_2k82YHau7ilhDbYQTTe4r9Y1xTg", "AIzaSyBUwZ2JPzdnUS764k3WyMn_cabuQnmxxIo",
-                      "AIzaSyAkA567O88D-wIdOcLnM1FyQnLxsLoaGkg", "AIzaSyCHGHU46vSrSwcv8xVEqRb1ZiqrrVXbjHM" ]
+                      "AIzaSyAkA567O88D-wIdOcLnM1FyQnLxsLoaGkg", "AIzaSyCHGHU46vSrSwcv8xVEqRb1ZiqrrVXbjHM"]
+
+
+def read_input():
+    new_input_list = []
+    video_id_list = []
+    filename = 'input.xlsx'
+    try:
+        df = pd.read_excel(filename, header=None, engine='openpyxl')
+        input_list = df.values.tolist()
+        for i in input_list:
+            new_input_list.append(i[0])
+    except:
+        print("You Need input.xlsx")
+        quit()
+    for i in new_input_list:
+        if "v=" in i:
+            v_id = i[(i.find("v=")+2):]
+            video_id_list.append(v_id)
+        else:
+            v_id = i[(i.find("shorts") + len("/shorts")):]
+            video_id_list.append(v_id)
+    return video_id_list
+
+
+def delete_folder(directory):
+    if os.path.exists(directory):
+       shutil.rmtree(directory, ignore_errors=True)
+
+
+def create_folder(directory):
+    delete_folder(directory)
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+    except OSError:
+            print('Error: Creating directory.' + directory)
 
 
 def delete_file(directory):
@@ -57,13 +98,11 @@ def create_reply_dictionary(reply:dict):
     return reply_dict
 
 
-if __name__ == '__main__':
-    start = time.time()
-
-    path = "C:\\Users\\agayo\\Desktop\\크몽\\daily_test\\youtube"#input("path: ")
-    #order = input("order: time? or like?")
-    video_id = "iQjEehs6-dU" #wlmKkCKu7H4" #input("video id: ")
-
+def crawling_video(video_path):
+    pid = os.getpid()
+    path = video_path
+    video_id = path[path.rfind("\\")+len("\\"):]
+    key_num = 0
     comment_and_reply_path = path + "\\comment_and_reply.csv"
     comment_path = path + "\\comment.csv"
     reply_path = path + "\\reply.csv"
@@ -71,12 +110,8 @@ if __name__ == '__main__':
     delete_file(comment_and_reply_path)
     delete_file(comment_path)
     delete_file(reply_path)
-
-    key_num = 0
     developer_key = developer_key_list[key_num]
-
     comment_nextPageToken = ''
-
     count = 0
     while True:
         try:
@@ -95,7 +130,7 @@ if __name__ == '__main__':
                 count += 1
                 overwrite_csv(comment_dict, comment_and_reply_path)
                 overwrite_csv(comment_dict, comment_path)
-                print("##############" + " save comment: " + str(
+                print("##############" + str(pid) + " save comment: " + str(
                     count) + " ##############")
                 if 'replies' in comment:
                     reply_count = 0
@@ -132,7 +167,7 @@ if __name__ == '__main__':
                                     reply_count += 1
                                     count += 1
                                     overwrite_csv(reply_dict, reply_tmp_path)
-                                    print("=======save reply: " + str(reply_count) + "/" + str(
+                                    print("=======" + str(pid) + "save reply: " + str(reply_count) + "/" + str(
                                         comment_dict["reply_count"]) + "=======")
                                 if 'nextPageToken' in reply_response:
                                     reply_nextPageToken = reply_response["nextPageToken"]
@@ -159,8 +194,33 @@ if __name__ == '__main__':
             print(str(developer_key_list[key_num]) + " is exceed quota")
             key_num += 1
             developer_key = developer_key_list[key_num]
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + "is finish" + " ☆☆☆☆☆☆☆☆☆☆ " )
+
+
+
+
+if __name__ == '__main__':
+    start = time.time()
+
+    root_path = input("save_path?: ")  # "C:\\Users\\agayo\\Desktop\\크몽\\daily_test\\youtube"
+    order = input("order: time? or like?")
+    video_id_list = read_input()
+    path_list = []
+    for i in video_id_list:
+        create_folder(root_path + "\\" + i)
+        path_list.append(root_path + "\\" + i)
+
+    process = Pool(cpu_num)
+    progress = process.map_async(crawling_video, path_list)
+    finish = progress.get()
+    process.close()
+    process.join()
 
     print("time :", time.time() - start)
+
+
+
+
 
 
 
