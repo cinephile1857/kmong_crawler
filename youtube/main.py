@@ -55,6 +55,12 @@ def delete_file(directory):
         os.remove(directory)
 
 
+def read_directory(directory):
+    file_list = os.listdir(directory)
+    file_list = natsort.natsorted(file_list)
+    return file_list
+
+
 def overwrite_csv(data,directory):
     data = pd.DataFrame.from_dict([data])
     if not os.path.exists(directory):
@@ -198,6 +204,11 @@ def sort_comment_oldest(video_path):
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
         overwrite_csv(tmp, path+"\\"+"comment_oldest.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "comment" in i:
+            if i != "comment_oldest.csv":
+                delete_file(path+"\\"+i)
 
 
 def sort_comment_like(video_path):
@@ -207,6 +218,11 @@ def sort_comment_like(video_path):
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
         overwrite_csv(tmp, path+"\\"+"comment_like.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "comment" in i:
+            if i != "comment_like.csv":
+                delete_file(path+"\\"+i)
 
 
 def sort_comment_reply(video_path):
@@ -215,7 +231,12 @@ def sort_comment_reply(video_path):
     comment_tmp = comment_tmp.sort_values(by=['reply_count','publish_time'],ascending=[False,False])
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
-        overwrite_csv(tmp, path+"\\"+"comment_reply.csv")
+        overwrite_csv(tmp, path+"\\"+"comment_reple.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "comment" in i:
+            if i != "comment_reple.csv":
+                delete_file(path+"\\"+i)
 
 
 def sort_reply_oldest(video_path):
@@ -225,6 +246,11 @@ def sort_reply_oldest(video_path):
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
         overwrite_csv(tmp, path+"\\"+"reply_oldest.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "reply" in i:
+            if i != "reply_oldest.csv":
+                delete_file(path+"\\"+i)
 
 
 def sort_reply_recent(video_path):
@@ -234,6 +260,15 @@ def sort_reply_recent(video_path):
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
         overwrite_csv(tmp, path+"\\"+"reply_recent.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "reply" in i:
+            if i != "reply_recent.csv":
+                delete_file(path+"\\"+i)
+
+
+def integration_comment_reply(video_path):
+    print("not yet")
 
 
 if __name__ == '__main__':
@@ -257,39 +292,30 @@ if __name__ == '__main__':
     crawling_process.close()
     crawling_process.join()
 
+    comment_order_process = Pool(cpu_num)
     if comment_order == "0":
         pass
     elif comment_order == "1":
-        comment_order_process = Pool(cpu_num)
         comment_order_progress = comment_order_process.map_async(sort_comment_oldest, path_list)
         comment_order_finish = comment_order_progress.get()
-        comment_order_process.close()
-        comment_order_process.join()
     elif comment_order == "2":
-        comment_order_process = Pool(cpu_num)
         comment_order_progress = comment_order_process.map_async(sort_comment_like, path_list)
         comment_order_finish = comment_order_progress.get()
-        comment_order_process.close()
-        comment_order_process.join()
     else:
-        comment_order_process = Pool(cpu_num)
         comment_order_progress = comment_order_process.map_async(sort_comment_reply, path_list)
         comment_order_finish = comment_order_progress.get()
-        comment_order_process.close()
-        comment_order_process.join()
+    comment_order_process.close()
+    comment_order_process.join()
 
+    reply_order_process = Pool(cpu_num)
     if reply_order == "0":
-        reply_order_process = Pool(cpu_num)
         reply_order_progress = reply_order_process.map_async(sort_reply_recent, path_list)
         reply_order_finish = reply_order_progress.get()
-        reply_order_process.close()
-        reply_order_process.join()
     else:
-        reply_order_process = Pool(cpu_num)
         reply_order_progress = reply_order_process.map_async(sort_reply_oldest, path_list)
         reply_order_finish = reply_order_progress.get()
-        reply_order_process.close()
-        reply_order_process.join()
+    reply_order_process.close()
+    reply_order_process.join()
 
     print("time :", time.time() - start)
 

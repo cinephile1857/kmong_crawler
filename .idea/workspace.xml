@@ -3,7 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="dc1de643-404b-4fa8-9478-9150da409a62" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/youtube/input.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/youtube/input.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/youtube/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/youtube/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -58,6 +57,15 @@
     </option>
   </component>
   <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/youtube/main.py</url>
+          <line>288</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
     <watches-manager>
       <configuration name="PythonConfigurationType">
         <watch expression="reply_dict" />
