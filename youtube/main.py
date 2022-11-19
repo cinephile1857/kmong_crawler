@@ -108,7 +108,7 @@ def crawling_video(video_path):
     path = video_path
     video_id = path[path.rfind("\\")+len("\\"):]
     key_num = 0
-    comment_path = path + "\\comment_recent.csv"
+    comment_path = path + "\\comment.csv"
     reply_path = path + "\\reply.csv"
     reply_tmp_path = path + "\\reply_tmp.csv"
     delete_file(comment_path)
@@ -168,7 +168,7 @@ def crawling_video(video_path):
                                     reply_count += 1
                                     count += 1
                                     overwrite_csv(reply_dict, reply_tmp_path)
-                                    print("=======" + str(pid) + "save reply: " + str(reply_count) + "/" + str(
+                                    print("=======" + str(pid) + " save reply: " + str(reply_count) + "/" + str(
                                         comment_dict["reply_count"]) + "=======")
                                 if 'nextPageToken' in reply_response:
                                     reply_nextPageToken = reply_response["nextPageToken"]
@@ -194,12 +194,31 @@ def crawling_video(video_path):
             print(str(developer_key_list[key_num]) + " is exceed quota")
             key_num += 1
             developer_key = developer_key_list[key_num]
-    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + "is finish" + " ☆☆☆☆☆☆☆☆☆☆ " )
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ " )
+
+
+def sort_comment_recent(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting comment" + "##############" )
+    path = video_path
+    comment_tmp = pd.read_csv(path+"\\"+"comment.csv")
+    comment_tmp = comment_tmp.sort_values(by='publish_time')
+    comment_tmp = comment_tmp.to_dict('records')
+    for tmp in comment_tmp:
+        overwrite_csv(tmp, path+"\\"+"comment_recent.csv")
+    file_list = read_directory(path)
+    for i in file_list:
+        if "comment" in i:
+            if i != "comment_recent.csv":
+                delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 def sort_comment_oldest(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting comment" + "##############" )
     path = video_path
-    comment_tmp = pd.read_csv(path+"\\"+"comment_recent.csv")
+    comment_tmp = pd.read_csv(path+"\\"+"comment.csv")
     comment_tmp = comment_tmp.sort_values(by='publish_time')
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
@@ -209,11 +228,14 @@ def sort_comment_oldest(video_path):
         if "comment" in i:
             if i != "comment_oldest.csv":
                 delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 def sort_comment_like(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting comment" + "##############")
     path = video_path
-    comment_tmp = pd.read_csv(path+"\\"+"comment_recent.csv")
+    comment_tmp = pd.read_csv(path+"\\"+"comment.csv")
     comment_tmp = comment_tmp.sort_values(by=['like_count','publish_time'],ascending=[False,False])
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
@@ -223,11 +245,14 @@ def sort_comment_like(video_path):
         if "comment" in i:
             if i != "comment_like.csv":
                 delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 def sort_comment_reply(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting comment" + "##############")
     path = video_path
-    comment_tmp = pd.read_csv(path+"\\"+"comment_recent.csv")
+    comment_tmp = pd.read_csv(path+"\\"+"comment.csv")
     comment_tmp = comment_tmp.sort_values(by=['reply_count','publish_time'],ascending=[False,False])
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
@@ -237,9 +262,12 @@ def sort_comment_reply(video_path):
         if "comment" in i:
             if i != "comment_reple.csv":
                 delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 def sort_reply_oldest(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting reply" + "##############")
     path = video_path
     comment_tmp = pd.read_csv(path+"\\"+"reply.csv")
     comment_tmp = comment_tmp.sort_values(by='publish_time')
@@ -251,9 +279,12 @@ def sort_reply_oldest(video_path):
         if "reply" in i:
             if i != "reply_oldest.csv":
                 delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 def sort_reply_recent(video_path):
+    pid = os.getpid()
+    print("##############" + str(pid) + ": sorting reply" + "##############")
     path = video_path
     comment_tmp = pd.read_csv(path+"\\"+"reply.csv")
     comment_tmp = comment_tmp.sort_values(by='publish_time',ascending=False)
@@ -265,10 +296,46 @@ def sort_reply_recent(video_path):
         if "reply" in i:
             if i != "reply_recent.csv":
                 delete_file(path+"\\"+i)
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
+
+
+def csv_to_excel(src_dir,save_dir):
+    src = pd.read_csv(src_dir)
+    src.to_excel(save_dir,index=None,header=True)
 
 
 def integration_comment_reply(video_path):
-    print("not yet")
+    pid = os.getpid()
+    print("##############" + str(pid) + ": integration start" + "##############")
+    path = video_path
+    file_list = read_directory(path)
+    comment_path = ''
+    reply_path = ''
+    final_path = path + "\\" + "final.csv"
+    delete_file(final_path)
+    for i in file_list:
+        if "comment" in i: comment_path = path + "\\" + i
+        if "reply" in i: reply_path = path + "\\" +i
+    all_count = 0
+    for cnt, chunk in enumerate(pd.read_csv(comment_path,chunksize=1)):
+        all_count += 1
+    each_count = 0
+    reply = pd.read_csv(reply_path)
+    for comment_cnt, comment_chunk in enumerate(pd.read_csv(comment_path, chunksize=1)):
+        each_count += 1
+        print(str(pid)+": " + str(each_count) + "/" + str(all_count))
+        if not os.path.exists(final_path):
+            comment_chunk.to_csv(final_path, mode='w', index=False, header=True, encoding='utf-8-sig')
+        else:
+            comment_chunk.to_csv(final_path, mode='a', index=False, header=False, encoding='utf-8-sig')
+        if comment_chunk['reply_count'].values[0] > 0:
+            comment_id = comment_chunk['id'].values[0]
+            comment_reply = reply[reply['parent_id'] == comment_id]
+            if not os.path.exists(final_path):
+                comment_reply.to_csv(final_path, mode='w', index=False, header=True, encoding='utf-8-sig')
+            else:
+                comment_reply.to_csv(final_path, mode='a', index=False, header=False, encoding='utf-8-sig')
+    print("☆☆☆☆☆☆☆☆☆☆ " + str(pid) + " is finish" + " ☆☆☆☆☆☆☆☆☆☆ ")
 
 
 if __name__ == '__main__':
@@ -276,9 +343,9 @@ if __name__ == '__main__':
 
     root_path = input("save_path?: ")
 
-    comment_order = input("comment_order? \n[0]:recent(최신순, 내림차순)\n[1]:order(오래된순, 오름차순)"
+    comment_order = input("comment_older? \n[0]:recent(최신순, 내림차순)\n[1]:older(오래된순, 오름차순)"
                           "\n[2]:like(좋아요순, 동일시 최신순)\n[3]:reply(답글순, 동일시 최신순)\n")
-    reply_order = input("reply_order? \n[0]:recent(최신순, 내림차순)\n[1]:order(오래된순, 오름차순)\n")
+    reply_order = input("reply_older? \n[0]:recent(최신순, 내림차순)\n[1]:older(오래된순, 오름차순)\n")
 
     video_id_list = read_input()
     path_list = []
@@ -294,7 +361,8 @@ if __name__ == '__main__':
 
     comment_order_process = Pool(cpu_num)
     if comment_order == "0":
-        pass
+        comment_order_progress = comment_order_process.map_async(sort_comment_recent, path_list)
+        comment_order_finish = comment_order_progress.get()
     elif comment_order == "1":
         comment_order_progress = comment_order_process.map_async(sort_comment_oldest, path_list)
         comment_order_finish = comment_order_progress.get()
@@ -316,6 +384,18 @@ if __name__ == '__main__':
         reply_order_finish = reply_order_progress.get()
     reply_order_process.close()
     reply_order_process.join()
+
+    integration_process = Pool(cpu_num)
+    integration_progress = integration_process.map_async(integration_comment_reply, path_list)
+    integration_finish = integration_progress.get()
+    integration_process.close()
+    integration_process.join()
+
+    for i in path_list:
+        for j in read_directory(i):
+            source_path = i + "\\" + j
+            convert_path = i + "\\" + j[:j.find('csv')] + "xlsx"
+            csv_to_excel(source_path,convert_path)
 
     print("time :", time.time() - start)
 
