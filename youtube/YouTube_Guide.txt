@@ -1,0 +1,115 @@
+=========================================================================================================================
+
+<API>
+
+- https://developers.google.com/youtube/v3
+
+<API_CommentThreads>
+
+- https://developers.google.com/youtube/v3/docs/commentThreads
+
+<API_Comments>
+
+- https://developers.google.com/youtube/v3/docs/comments
+
+
+<GCP_Project>
+
+- https://console.cloud.google.com/getting-started
+
+- project name: kmong
+
+- API key : cinephile1854: AIzaSyB5K8CCGzL-5e2u4VvwUEUWBPeUoCHOqdA
+
+	    agayong93: AIzaSyDzbqF9EhH0TOYFc4JSy-kWrXRyuW_yo6Y
+
+
+<비디오 아이디>
+
+- url에서 v= 이후가 아이디
+
+- ex. https://www.youtube.com/watch?v=fygyNQAzRFM ===> id: fygyNQAzRFM
+
+- shorts의 경우 /shorts/ 이후가 아이디
+
+- ex. https://www.youtube.com/shorts/CNitWPA9LGE ===> id: CNitWPA9LGE
+
+
+=========================================================================================================================
+
+<사용순서>
+
+(1) main: 댓글/답글 수집, 행 정렬, csv&xlsx저장
+
+(2) column_fix: 열 정렬(원하는 열 내용과 순서)
+
+(3) word_cloud: 단어 빈도수 측정 및 워드 클라우드
+
+
+<input>
+
+(main)
+
+- main script 위치의 input.xlsx
+
+- path: 저장위치
+
+- 댓글/답글 순서: 댓글:오름차순/내림차순/좋아요순/답글순, 답글:오름차순/내림차순
+
+(column_fix)
+
+- path: 저장위치
+
+- src_file: 열 순서 변경을 원하는 최종파일
+
+(word_cloud)
+
+- path: 저장위치
+
+
+
+<Output>
+
+(main)
+
+- comment.csv/comment.xlsx: 댓글
+
+- reply.csv/reply.xlsx: 답글
+
+- final.csv/final.xlsx: 댓글/답글 통합
+
+(column_fix)
+
+- ~_colum_fix.csv/~_colum_fix.xlsx: 열 순서 및 내용 반영 파일
+
+(word_cloud)
+
+- words_list.csv: 단어 빈도수
+
+- wordcloud.png: 워드 클라우드
+
+
+
+※주의사항
+
+- 노출되는 댓글의 순서와 차이가 있음. 그 이유는 API를 사용하기 때문에.
+
+  인기 댓글순의 경우 유튜브만의 노출 알고리즘이 따로 있어 반영할 수 없음(https://zdnet.co.kr/view/?no=20130925092512)
+
+  대신 좋아요순/답글순으로 나열이 가능
+
+- 유튜브에서 카운트한 개수와 차이가 있을 수 있음. 
+
+  삭제, 댓글 필터링 등의 이유.
+
+  노출되는 댓글은 모두 수집이 됨.
+  
+  https://appadal.tistory.com/1288
+
+
+☆65532개 이상은 URL기록이 안됨(엑셀의 경우)
+
+
+=========================================================================================================================
+
+
