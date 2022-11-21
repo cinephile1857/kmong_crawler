@@ -11,6 +11,11 @@ from wordcloud import WordCloud
 import fasttext
 
 
+def csv_to_excel(src_dir,save_dir):
+    src = pd.read_csv(src_dir, encoding='cp949')
+    src.to_excel(save_dir,index=None,header=None,engine='xlsxwriter')
+
+
 def wordcloud(directory, src_file):
     # nltk.download('punkt')
     # nltk.download('averaged_perceptron_tagger')
@@ -64,7 +69,7 @@ def wordcloud(directory, src_file):
         writer = csv.writer(f)
         for k, v in tag_list.items():
             writer.writerow([k, v])
-
+    csv_to_excel(directory+'\\words_list.csv',directory+'\\words_list.xlsx')
     wc = WordCloud(font_path="./NanumSquareR.ttf",
                    background_color='white',
                    width=512,height=512,

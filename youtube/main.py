@@ -202,7 +202,7 @@ def sort_comment_recent(video_path):
     print("##############" + str(pid) + ": sorting comment" + "##############" )
     path = video_path
     comment_tmp = pd.read_csv(path+"\\"+"comment.csv")
-    comment_tmp = comment_tmp.sort_values(by='publish_time')
+    comment_tmp = comment_tmp.sort_values(by='publish_time', ascending=False)
     comment_tmp = comment_tmp.to_dict('records')
     for tmp in comment_tmp:
         overwrite_csv(tmp, path+"\\"+"comment_recent.csv")
@@ -301,7 +301,7 @@ def sort_reply_recent(video_path):
 
 def csv_to_excel(src_dir,save_dir):
     src = pd.read_csv(src_dir)
-    src.to_excel(save_dir,index=None,header=True)
+    src.to_excel(save_dir,index=None,header=True, engine='xlsxwriter')
 
 
 def integration_comment_reply(video_path):
